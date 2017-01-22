@@ -8,11 +8,15 @@ public class GameLogic : MonoBehaviour {
 	public GameObject Player;
 	public Transform PlatformSpawnPoint;
 	public GameObject PlayArea;
+	public GameObject HoleTrigger;
 
 	List<GameObject> Platforms = new List<GameObject> ();
+	List<GameObject> HoleTriggers = new List<GameObject> ();
 	float PlatformSpawnLengthFromPlayer = 60f;
 	float PlatformGap = 15;
 	float PlatformLength;
+	float PlatformHeight;
+	float FloorHeight = 13f;
 	List<float> HolePositions = new List<float>();
 
 	// Use this for initialization
@@ -21,6 +25,7 @@ public class GameLogic : MonoBehaviour {
 		HolePositions.Add (-40f);
 
 		PlatformLength = Platform.GetComponent<Renderer> ().bounds.size.z;
+		PlatformHeight = Platform.GetComponent<Renderer> ().bounds.size.y;
 		foreach (GameObject platform in GameObject.FindGameObjectsWithTag ("Platform")) {
 			Platforms.Add (platform);
 		}
@@ -34,25 +39,26 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 
-	void BuildFloors() {
-		float floorHeight = 13f;
+	void BuildFloors() {		
 		if (PlatformSpawnPoint.position.z - HolePositions [0] < 80f) {
 			SpawnPlatform (0);
 		} else {
 			HolePositions [0] = PlatformSpawnPoint.position.z;
+			SpawnHoleTrigger (-PlatformHeight);
 		}
 		if (PlatformSpawnPoint.position.z - HolePositions [1] < 80f) {
-			SpawnPlatform (1 * floorHeight);
+			SpawnPlatform (1 * FloorHeight);
 		} else {
 			HolePositions [1] = PlatformSpawnPoint.position.z;
+			SpawnHoleTrigger (FloorHeight - PlatformHeight);
 		}
-		SpawnPlatform (-1 * floorHeight);
-		SpawnPlatform (2 * floorHeight);
-		SpawnPlatform (-2 * floorHeight);
-		SpawnPlatform (3 * floorHeight);
-		SpawnPlatform (-3 * floorHeight);
-		SpawnPlatform (4 * floorHeight);
-		SpawnPlatform (-4 * floorHeight);
+		SpawnPlatform (-1 * FloorHeight);
+		SpawnPlatform (2 * FloorHeight);
+		SpawnPlatform (-2 * FloorHeight);
+		SpawnPlatform (3 * FloorHeight);
+		SpawnPlatform (-3 * FloorHeight);
+		SpawnPlatform (4 * FloorHeight);
+		SpawnPlatform (-4 * FloorHeight);
 		PlatformSpawnPoint.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
 			PlatformSpawnPoint.transform.position.y,
@@ -60,11 +66,18 @@ public class GameLogic : MonoBehaviour {
 		);
 	}
 
+	void SpawnHoleTrigger(float height) {
+		GameObject holeTrigger = GetHoleTrigger ();
+		holeTrigger.transform.position = new Vector3 (
+			PlatformSpawnPoint.transform.position.x,
+			Player.transform.position.y + height,
+			PlatformSpawnPoint.transform.position.z - PlatformLength / 2
+		);
+		holeTrigger.SetActive (true);
+	}
+
 	void SpawnPlatform(float height) {
 		GameObject platform = GetPlaform ();
-		if (height == 0) {
-			//platform.transform.localScale = new Ve
-		}
 		platform.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
 			PlatformSpawnPoint.transform.position.y + height,
@@ -84,8 +97,24 @@ public class GameLogic : MonoBehaviour {
 			p = (GameObject) Instantiate (Platform);
 			Platforms.Add (p);
 			p.name = "Platform_" + (Platforms.Count - 1).ToString ();
+			p.transform.parent = GameObject.FindGameObjectWithTag ("Platforms").transform;
 		}
 		p.SetActive (false);
 		return p;
+	}
+
+	GameObject GetHoleTrigger() {
+		GameObject h = null;
+		for (int i = 0; i < HoleTriggers.Count; ++i) {
+			if (!HoleTriggers[i].activeSelf) {
+				h = HoleTriggers [i];
+			}
+		}
+		if (h == null) {
+			h = (GameObject) Instantiate (HoleTrigger);
+			HoleTriggers.Add (h);
+		}
+		h.SetActive (false);
+		return h;
 	}
 }

@@ -5,11 +5,11 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
 	public Transform PlatformSpawnPoint;
+	public static float FloorHeight = 0f;
 
 	Rigidbody RB;
 	float Speed = 20f;
 	float JumpSpeed = 40f;
-	float LastPlatformHeight = 0f;
 	float FallAcceleration = 3f;
 	float FallTerminalVelocity = 10f;
 
@@ -52,13 +52,13 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider col) {
-		if (col.gameObject.tag == "PlatformTop" && LastPlatformHeight != col.transform.parent.position.y) {
+		if (col.gameObject.tag == "PlatformTop" && FloorHeight != col.transform.parent.position.y) {
 			PlatformSpawnPoint.position = new Vector3 (
 				PlatformSpawnPoint.transform.position.x,
 				col.transform.parent.position.y,
 				PlatformSpawnPoint.transform.position.z
 			);
-			LastPlatformHeight = col.transform.parent.position.y;
+			FloorHeight = col.transform.parent.position.y;
 		}
 	}
 }
