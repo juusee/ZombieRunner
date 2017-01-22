@@ -7,6 +7,7 @@ public class PlayerMovement : MonoBehaviour {
 	public Transform PlatformSpawnPoint;
 	public static float FloorHeight = 0f;
 	public static float Speed = 20f;
+	public GameObject EnemyWall;
 
 	Rigidbody RB;
 	float JumpSpeed = 40f;
@@ -53,6 +54,19 @@ public class PlayerMovement : MonoBehaviour {
 				PlatformSpawnPoint.transform.position.z
 			);
 			FloorHeight = col.transform.parent.position.y;
+		}
+	}
+
+	void OnEnable() {
+		EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ = -20f;
+	}
+
+	void OnCollisionEnter(Collision col) {
+		if (col.gameObject.tag == "Crate") {
+			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 10f;
+		}
+		if (col.gameObject.tag == "Enemy") {
+			gameObject.SetActive (false);
 		}
 	}
 }

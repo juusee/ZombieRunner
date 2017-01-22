@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayArea : MonoBehaviour {
+public class Crate : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
@@ -11,12 +11,12 @@ public class PlayArea : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		
 	}
 
-	void OnTriggerExit(Collider col) {
-		// Disable everything that leaves the trigger
-		if (col.tag != "Enemy") {
-			col.gameObject.SetActive(false);
+	void OnCollisionEnter(Collision col) {
+		if (col.gameObject.tag == "Player" || col.gameObject.tag == "Enemy") {
+			gameObject.SetActive (false);
 		}
 	}
 }

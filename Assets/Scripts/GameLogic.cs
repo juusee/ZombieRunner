@@ -9,26 +9,26 @@ public class GameLogic : MonoBehaviour {
 	public Transform PlatformSpawnPoint;
 	public GameObject PlayArea;
 	public GameObject HoleTrigger;
+	public GameObject Crate;
 
 	List<GameObject> Platforms = new List<GameObject> ();
 	List<GameObject> HoleTriggers = new List<GameObject> ();
+	List<GameObject> Crates = new List<GameObject> ();
 	float PlatformSpawnLengthFromPlayer = 60f;
-	float PlatformGap = 15;
 	float PlatformLength;
 	float PlatformHeight;
 	float FloorHeight = 13f;
 	List<float> HolePositions = new List<float>();
+	Vector3 PlatformSpawnPointInitialPos;
 
 	// Use this for initialization
 	void Start () {
-		HolePositions.Add (-20f);
-		HolePositions.Add (-40f);
-
 		PlatformLength = Platform.GetComponent<Renderer> ().bounds.size.z;
 		PlatformHeight = Platform.GetComponent<Renderer> ().bounds.size.y;
 		foreach (GameObject platform in GameObject.FindGameObjectsWithTag ("Platform")) {
 			Platforms.Add (platform);
 		}
+		PlatformSpawnPointInitialPos = new Vector3 (0, 0, -40);
 	}
 	
 	// Update is called once per frame
@@ -42,12 +42,18 @@ public class GameLogic : MonoBehaviour {
 	void BuildFloors() {		
 		if (PlatformSpawnPoint.position.z - HolePositions [0] < 80f) {
 			SpawnPlatform (0);
+			if (Random.value < 0.1) {
+				SpawnCrate (PlatformHeight / 2 + Crate.GetComponent<Renderer>().bounds.size.y / 2);
+			}
 		} else {
 			HolePositions [0] = PlatformSpawnPoint.position.z;
 			SpawnHoleTrigger (-PlatformHeight);
 		}
 		if (PlatformSpawnPoint.position.z - HolePositions [1] < 80f) {
 			SpawnPlatform (1 * FloorHeight);
+			if (Random.value < 0.1) {
+				SpawnCrate (PlatformHeight / 2 + Crate.GetComponent<Renderer>().bounds.size.y / 2);
+			}
 		} else {
 			HolePositions [1] = PlatformSpawnPoint.position.z;
 			SpawnHoleTrigger (FloorHeight - PlatformHeight);
@@ -86,6 +92,16 @@ public class GameLogic : MonoBehaviour {
 		platform.SetActive (true);
 	}
 
+	void SpawnCrate(float height) {
+		GameObject crate = GetCrate ();
+		crate.transform.position = new Vector3 (
+			PlatformSpawnPoint.transform.position.x,
+			PlatformSpawnPoint.transform.position.y + height,
+			PlatformSpawnPoint.transform.position.z
+		);
+		crate.SetActive (true);
+	}
+
 	GameObject GetPlaform() {
 		GameObject p = null;
 		for (int i = 0; i < Platforms.Count; ++i) {
@@ -116,5 +132,39 @@ public class GameLogic : MonoBehaviour {
 		}
 		h.SetActive (false);
 		return h;
+	}
+
+	GameObject GetCrate() {
+		GameObject c = null;
+		for (int i = 0; i < Crates.Count; ++i) {
+			if (!Crates[i].activeSelf) {
+				c = Crates [i];
+			}
+		}
+		if (c == null) {
+			c = (GameObject) Instantiate (Crate);
+			Crates.Add (c);
+		}
+		c.SetActive (false);
+		return c;
+	}
+
+	public void Reset() {
+		foreach (GameObject g in Platforms) {
+			Destroy (g);
+		}
+		Platforms = new List<GameObject> ();
+		foreach (GameObject g in HoleTriggers) {
+			Destroy (g);
+		}
+		HoleTriggers = new List<GameObject> ();
+		foreach (GameObject g in Crates) {
+			Destroy (g);
+		}
+		Crates = new List<GameObject> ();
+		HolePositions = new List<float> ();
+		HolePositions.Add (-20f);
+		HolePositions.Add (-40f);
+		PlatformSpawnPoint.transform.position = PlatformSpawnPointInitialPos;
 	}
 }

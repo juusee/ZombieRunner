@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Enemy : MonoBehaviour {
+public class EnemyMovement : MonoBehaviour {
 
 	Rigidbody RB;
 	float Speed = PlayerMovement.Speed;
 	float AttackSpeed = 20f;
 	float JumpSpeed = 40f;
 	float FloorHeight;
+	Vector3 InitialPosition;
+
+	void Awake() {
+		InitialPosition = transform.position;
+	}
 
 	// Use this for initialization
 	void Start () {
@@ -45,6 +50,10 @@ public class Enemy : MonoBehaviour {
 
 	void Down() {
 		RB.velocity = new Vector3 (0, -0.5f, 0.5f);
+	}
+
+	void OnDisable() {
+		transform.position = InitialPosition;
 	}
 
 	void OnTriggerStay(Collider col) {

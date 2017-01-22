@@ -11,7 +11,7 @@ public class GameObjectFollower : MonoBehaviour {
 
 	float OffsetX;
 	float OffsetY;
-	float OffsetZ;
+	public float OffsetZ;
 
 	// Use this for initialization
 	void Start () {
