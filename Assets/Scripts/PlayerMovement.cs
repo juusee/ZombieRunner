@@ -6,12 +6,10 @@ public class PlayerMovement : MonoBehaviour {
 
 	public Transform PlatformSpawnPoint;
 	public static float FloorHeight = 0f;
+	public static float Speed = 20f;
 
 	Rigidbody RB;
-	float Speed = 20f;
 	float JumpSpeed = 40f;
-	float FallAcceleration = 3f;
-	float FallTerminalVelocity = 10f;
 
 	Vector2 JumpStartPos;
 	Vector2 JumpEndPos;
@@ -39,16 +37,12 @@ public class PlayerMovement : MonoBehaviour {
 	void Jump() {
 		RB.velocity = Vector3.forward * Speed;
 
-		// Get Angle in Radians
 		float AngleRad = Mathf.Atan2(JumpEndPos.y -JumpStartPos.y, JumpEndPos.x - JumpStartPos.x);
-		// Get Angle in Degrees
 		float AngleDeg = (180 / Mathf.PI) * AngleRad;
 
 		Vector3 angleVelocity = Quaternion.AngleAxis (AngleDeg, Vector3.left) * Vector3.forward;
 		Vector3 forceVector = new Vector3 (angleVelocity.x * JumpSpeed, angleVelocity.y * JumpSpeed, Mathf.Clamp (angleVelocity.z * JumpSpeed, 0, JumpSpeed));
 		RB.AddForce (forceVector, ForceMode.VelocityChange);
-
-		//RB.AddForce (Vector3.up * JumpSpeed, ForceMode.VelocityChange);
 	}
 
 	void OnTriggerEnter(Collider col) {

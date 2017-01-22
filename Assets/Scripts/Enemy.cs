@@ -5,21 +5,15 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour {
 
-	GameObject Player;
 	Rigidbody RB;
-	float Speed;
+	float Speed = PlayerMovement.Speed;
 	float AttackSpeed = 20f;
 	float JumpSpeed = 40f;
 	float FloorHeight;
 
-	Text JumpText;
-
 	// Use this for initialization
 	void Start () {
 		RB = GetComponent<Rigidbody> ();
-		Player = GameObject.FindGameObjectWithTag ("Player");
-		Speed = Player.GetComponent<Rigidbody> ().velocity.z;
-		JumpText = GameObject.FindGameObjectWithTag ("Respawn").GetComponent<Text>();
 	}
 	
 	// Update is called once per frame
@@ -31,9 +25,7 @@ public class Enemy : MonoBehaviour {
 		if (Random.value < 0.01) {
 			Attack ();
 		}
-		Speed = Player.GetComponent<Rigidbody> ().velocity.z;
-		// RB.velocity = new Vector3 (RB.velocity.x, RB.velocity.y, Speed);
-		if (RB.velocity.z < Player.GetComponent<Rigidbody> ().velocity.z) {
+		if (RB.velocity.z < Speed) {
 			RB.AddForce(new Vector3(0, -0.5f, 1f), ForceMode.VelocityChange);
 		}
 	}
@@ -70,9 +62,6 @@ public class Enemy : MonoBehaviour {
 		}
 		if (col.gameObject.tag == "HoleTrigger") {
 			if (PlayerMovement.FloorHeight > FloorHeight) {
-				int count = int.Parse (JumpText.text);
-				++count;
-				JumpText.text = count.ToString ();
 				Jump ();
 			} else if (PlayerMovement.FloorHeight == FloorHeight) {
 				Forward ();
