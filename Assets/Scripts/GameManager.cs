@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour {
 		PlayerManager.Reset ();
 		EnemyManager.DisableControl ();
 		EnemyManager.Reset ();
-		GameLogic.GetComponent<GameLogic> ().enabled = true;
 		GameLogic.Reset ();
 		Menu.SetActive (true);
 

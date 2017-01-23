@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Crate : MonoBehaviour {
 
+	bool Destroying = false;
+
 	// Use this for initialization
 	void Start () {
 		
@@ -15,8 +17,22 @@ public class Crate : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision col) {
-		if (col.gameObject.tag == "Player" || col.gameObject.tag == "Enemy") {
-			gameObject.SetActive (false);
+		if (col.gameObject.tag == "Player" && !Destroying) {
+			Destroying = true;
+			StartCoroutine (WaitAndDestruct ());
+		} else if (col.gameObject.tag == "Enemy" && !Destroying) {
+			Destroying = true;
+			Destruct ();
 		}
+	}
+
+	IEnumerator WaitAndDestruct() {
+		yield return new WaitForSeconds(0.1f);
+		Destruct ();
+	}
+
+	void Destruct() {
+		gameObject.SetActive (false);
+		Destroying = false;
 	}
 }

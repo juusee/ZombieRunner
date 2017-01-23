@@ -21,13 +21,14 @@ public class PlayerMovement : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
-	void Update () {	
+	void Update () {
 		if (Input.GetMouseButtonDown(0)) {
 			JumpStartPos = Input.mousePosition;
 		}
-		if (Input.GetMouseButtonUp (0)) {
+		if (JumpStartPos != Vector2.zero && Input.GetMouseButton (0) && Vector2.Distance (JumpStartPos, Input.mousePosition) > 50f) {
 			JumpEndPos = Input.mousePosition;
 			Jump ();
+			JumpStartPos = Vector2.zero;
 		}
 	}
 
@@ -62,8 +63,9 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision col) {
+		// TODO only when front of the crate
 		if (col.gameObject.tag == "Crate") {
-			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 10f;
+			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 7f;
 		}
 		if (col.gameObject.tag == "Enemy") {
 			gameObject.SetActive (false);

@@ -14,7 +14,6 @@ public class EnemyManager : MonoBehaviour {
 		foreach (GameObject enemy in Enemies) {
 			enemy.SetActive (false);
 			enemy.SetActive (true);
-			print (enemy.name);
 		}
 	}
 

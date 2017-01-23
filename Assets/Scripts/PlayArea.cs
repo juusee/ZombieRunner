@@ -15,7 +15,7 @@ public class PlayArea : MonoBehaviour {
 
 	void OnTriggerExit(Collider col) {
 		// Disable everything that leaves the trigger
-		if (col.tag != "Enemy") {
+		if (col.tag != "Enemy" && col.tag != "EnemyWall") {
 			col.gameObject.SetActive(false);
 		}
 	}
