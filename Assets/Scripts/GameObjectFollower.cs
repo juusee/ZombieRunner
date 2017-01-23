@@ -8,10 +8,12 @@ public class GameObjectFollower : MonoBehaviour {
 	public bool FollowX;
 	public bool FollowY;
 	public bool FollowZ;
+	public float OffsetZ;
 
 	float OffsetX;
 	float OffsetY;
-	public float OffsetZ;
+	float SmoothTime = 0.1f;
+	Vector3 Velocity = Vector3.zero;
 
 	// Use this for initialization
 	void Start () {
@@ -22,10 +24,12 @@ public class GameObjectFollower : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = new Vector3 (
+		Vector3 targetPosition = new Vector3 (
 			FollowX ? GameObjectToFollow.position.x + OffsetX : transform.position.x,
 			FollowY ? GameObjectToFollow.position.y + OffsetY : transform.position.y,
 			FollowZ ? GameObjectToFollow.position.z + OffsetZ : transform.position.z
 		);
+		// Needs to have interpolation on on target
+		transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref Velocity, SmoothTime);
 	}
 }

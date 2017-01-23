@@ -30,20 +30,23 @@ public class PlayerMovement : MonoBehaviour {
 			Jump ();
 			JumpStartPos = Vector2.zero;
 		}
-	}
-
-	void FixedUpdate() {
-		RB.velocity = new Vector3 (RB.velocity.x, RB.velocity.y, Speed);
+		float speed = RB.velocity.z;
+		if (speed > Speed) {
+			speed -= 30f * Time.deltaTime;
+		} else {
+			speed = Speed;
+		}
+		RB.velocity = new Vector3 (RB.velocity.x, RB.velocity.y, speed);
 	}
 
 	void Jump() {
-		RB.velocity = Vector3.forward * Speed;
+		// RB.velocity = Vector3.forward * Speed;
 
 		float AngleRad = Mathf.Atan2(JumpEndPos.y -JumpStartPos.y, JumpEndPos.x - JumpStartPos.x);
 		float AngleDeg = (180 / Mathf.PI) * AngleRad;
 
 		Vector3 angleVelocity = Quaternion.AngleAxis (AngleDeg, Vector3.left) * Vector3.forward;
-		Vector3 forceVector = new Vector3 (angleVelocity.x * JumpSpeed, angleVelocity.y * JumpSpeed, Mathf.Clamp (angleVelocity.z * JumpSpeed, 0, JumpSpeed));
+		Vector3 forceVector = new Vector3 (angleVelocity.x * JumpSpeed, angleVelocity.y * JumpSpeed, angleVelocity.z * Speed);
 		RB.AddForce (forceVector, ForceMode.VelocityChange);
 	}
 
@@ -63,7 +66,7 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision col) {
-		// TODO only when front of the crate
+		// TODO only when collide to front of the crate
 		if (col.gameObject.tag == "Crate") {
 			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 7f;
 		}
