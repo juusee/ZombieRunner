@@ -45,7 +45,7 @@ public class EnemyMovement : MonoBehaviour {
 	}
 
 	void Forward() {
-		RB.AddForce (new Vector3(0, 0.5f, 1f) * JumpSpeed, ForceMode.VelocityChange);
+		RB.AddForce (new Vector3(0, 1f, 1f) * JumpSpeed, ForceMode.VelocityChange);
 	}
 
 	void Down() {

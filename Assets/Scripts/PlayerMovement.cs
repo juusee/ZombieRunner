@@ -58,6 +58,11 @@ public class PlayerMovement : MonoBehaviour {
 				PlatformSpawnPoint.transform.position.z
 			);
 			FloorHeight = col.transform.parent.position.y;
+		} else if (col.gameObject.tag != "PlatformTop") {
+			print (col.gameObject.tag);
+		}
+		if (col.gameObject.tag == "Crate") {
+			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 7f;
 		}
 	}
 
@@ -66,10 +71,6 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnCollisionEnter(Collision col) {
-		// TODO only when collide to front of the crate
-		if (col.gameObject.tag == "Crate") {
-			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 7f;
-		}
 		if (col.gameObject.tag == "Enemy") {
 			gameObject.SetActive (false);
 		}

@@ -27,7 +27,7 @@ public class Crate : MonoBehaviour {
 	}
 
 	IEnumerator WaitAndDestruct() {
-		yield return new WaitForSeconds(0.1f);
+		yield return new WaitForSeconds(0.15f);
 		Destruct ();
 	}
 
