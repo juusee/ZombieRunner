@@ -17,8 +17,6 @@ public class WallManager : MonoBehaviour {
 		GameObject wall = GameObject.FindGameObjectWithTag ("Wall");
 		WallPos = wall.transform.position;
 		InitialPos = wall.transform.position;
-
-		PrefabManager.SetListOfPrefabs (Wall);
 	}
 	
 	// Update is called once per frame

@@ -29,13 +29,8 @@ public class GameLogic : MonoBehaviour {
 		PlatformLength = Platform.GetComponent<Renderer> ().bounds.size.z;
 		PlatformHeight = Platform.GetComponent<Renderer> ().bounds.size.y;
 		foreach (GameObject platform in GameObject.FindGameObjectsWithTag ("Platform")) {
-			PrefabManager.AddToListOfPrefabs (Platform, platform);
+			PrefabManager.AddPrefab (Platform, platform);
 		}
-	
-		PrefabManager.SetListOfPrefabs (Platform);
-		PrefabManager.SetListOfPrefabs (PlatformWithLight);
-		PrefabManager.SetListOfPrefabs (HoleTrigger);
-		PrefabManager.SetListOfPrefabs (Crate);
 	}
 	
 	// Update is called once per frame
@@ -78,8 +73,6 @@ public class GameLogic : MonoBehaviour {
 		SpawnPlatform (-2 * FloorHeight, light1);
 		SpawnPlatform (3 * FloorHeight, light2);
 		SpawnPlatform (-3 * FloorHeight, light2);
-		//SpawnPlatform (4 * FloorHeight, light1);
-		//SpawnPlatform (-4 * FloorHeight, light1);
 		PlatformSpawnPoint.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
 			PlatformSpawnPoint.transform.position.y,
@@ -101,6 +94,10 @@ public class GameLogic : MonoBehaviour {
 			PlatformSpawnPoint.transform.position.z
 		);
 		platform.SetActive (true);
+		// TODO find out why all of the children are not active. Same on crate
+		foreach (Transform child in platform.transform) {
+			child.gameObject.SetActive (true);
+		}
 	}
 	
 	void SpawnHoleTrigger(float height) {
@@ -129,6 +126,5 @@ public class GameLogic : MonoBehaviour {
 	public void Reset() {
 		PlatformCount = 0;
 		PlatformSpawnPoint.transform.position = PlatformSpawnPointInitialPos;
-		print (PlatformSpawnPoint.transform.position);
 	}
 }

@@ -9,7 +9,7 @@ public class PlayerManager : MonoBehaviour {
 	PlayerMovement PlayerMovement;
 
 	void OnEnable() {
-		PlayerSpawnPoint = new Vector3(0f, 0f, 0f);
+		PlayerSpawnPoint = new Vector3(0f, 5f, 0f);
 		PlayerMovement = PlayerInstance.GetComponent<PlayerMovement> ();
 	}
 
