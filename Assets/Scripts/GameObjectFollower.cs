@@ -8,8 +8,8 @@ public class GameObjectFollower : MonoBehaviour {
 	public bool FollowX;
 	public bool FollowY;
 	public bool FollowZ;
-	public float OffsetZ;
 
+	float OffsetZ;
 	float OffsetX;
 	float OffsetY;
 	float SmoothTime = 0.1f;

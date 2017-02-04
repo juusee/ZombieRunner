@@ -98,7 +98,7 @@ public class PlayerMovement : MonoBehaviour {
 			TargetRotation = Quaternion.AngleAxis (0, Vector3.right);
 		}
 		if (col.gameObject.tag == "Crate") {
-			EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ += 7f;
+			EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ += 7f;
 		}
 	}
 
@@ -110,7 +110,7 @@ public class PlayerMovement : MonoBehaviour {
 
 	void OnEnable() {
 		CurrentState = PlayerState.Running;
-		EnemyWall.GetComponent<GameObjectFollower> ().OffsetZ = -20f;
+		EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ = -20f;
 	}
 
 	void OnCollisionEnter(Collision col) {

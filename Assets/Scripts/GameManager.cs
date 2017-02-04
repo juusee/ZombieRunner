@@ -9,6 +9,7 @@ public class GameManager : MonoBehaviour {
 	public WallManager WallManager;
 	public GameLogic GameLogic;
 	public GameObject Menu;
+	public EnemyWallMovement EnemyWall;
 
 	float endDelay = 2.5f;
 	WaitForSeconds endWait;
@@ -27,6 +28,7 @@ public class GameManager : MonoBehaviour {
 		GameLogic.Reset ();
 		WallManager.Reset ();
 		PrefabManager.Reset ();
+		EnemyWall.Reset ();
 		Menu.SetActive (true);
 
 		yield return StartCoroutine (RoundStarting());
