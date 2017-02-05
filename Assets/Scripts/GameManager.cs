@@ -6,7 +6,6 @@ public class GameManager : MonoBehaviour {
 
 	public PlayerManager PlayerManager;
 	public EnemyManager EnemyManager;
-	public WallManager WallManager;
 	public GameLogic GameLogic;
 	public GameObject Menu;
 	public EnemyWallMovement EnemyWall;
@@ -26,7 +25,6 @@ public class GameManager : MonoBehaviour {
 		EnemyManager.DisableControl ();
 		EnemyManager.Reset ();
 		GameLogic.Reset ();
-		WallManager.Reset ();
 		PrefabManager.Reset ();
 		EnemyWall.Reset ();
 		Menu.SetActive (true);

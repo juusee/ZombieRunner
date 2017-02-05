@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Crate : MonoBehaviour {
+public class Obstacle : MonoBehaviour {
 
 	bool Destroying = false;
 

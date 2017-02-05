@@ -4,21 +4,24 @@ using UnityEngine;
 
 public class GameLogic : MonoBehaviour {
 
+	public GameObject Wall;
 	public GameObject Platform;
-	public GameObject PlatformWithLight;
+	public GameObject Spotlight;
 	public GameObject Player;
 	public GameObject HoleTrigger;
 	public GameObject Crate;
+	public GameObject Tree;
 	public GameObject PlayArea;
 	public Transform PlatformSpawnPoint;
 
 	float PlatformSpawnLengthFromPlayer = 60f;
 	float PlatformLength;
 	float PlatformHeight;
+	float PlatformWidth;
 	float FloorHeight = 13f;
 	Vector3 PlatformSpawnPointInitialPos;
 
-	float PlatformCount = 0;
+	int PlatformCount = 1;
 
 	void Awake() {
 		PlatformSpawnPointInitialPos = PlatformSpawnPoint.transform.position;
@@ -26,8 +29,9 @@ public class GameLogic : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		PlatformLength = Platform.GetComponent<Renderer> ().bounds.size.z;
+		PlatformWidth = Platform.GetComponent<Renderer> ().bounds.size.x;
 		PlatformHeight = Platform.GetComponent<Renderer> ().bounds.size.y;
+		PlatformLength = Platform.GetComponent<Renderer> ().bounds.size.z;
 		foreach (GameObject platform in GameObject.FindGameObjectsWithTag ("Platform")) {
 			PrefabManager.AddPrefab (Platform, platform);
 		}
@@ -41,56 +45,120 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 
+	float Floor(int floorNumber) {
+		return PlatformSpawnPoint.position.y + floorNumber * FloorHeight;
+	}
+
 	void BuildFloors() {
-		PlatformCount++;
-		bool light2 = PlatformCount % 10 == 0;
-		bool light1 = PlatformCount % 5 == 0 && !light2;
-		if ((PlatformCount + 7) % 12 != 0 || PlatformSpawnPoint.position.z < 80) {
-			SpawnPlatform (0, light1);
-			if (light2) {
-				SpawnCrate (PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2);
-			}
-		} else {
-			SpawnHoleTrigger (-PlatformHeight);
+		string[] floor1 =  new string[] {"L", "-", "-", "H", "-", "-", "-", "-", "L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "H", "-"};
+		string[] floor0 =  new string[] {"-", "-", "-", "-", "L", "-", "-", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "T", "-", "L", "-", "-", "-"};
+		string[] floor_1 = new string[] {"L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "-", "-", "L", "-", "H", "-", "-", "-", "-", "-"};
+
+		int phases = floor1.Length;
+		int currentPhase = PlatformCount % phases;
+
+		string floor1Thing = floor1 [currentPhase];
+		string floor0Thing = floor0 [currentPhase];
+		string floor_1Thing = floor_1 [currentPhase];
+
+		// Walls
+		if (PlatformCount % 3 == 0) {
+			SpawnWall (Floor(0));
+			SpawnWall (Floor(1));
+			SpawnWall (Floor(-1));
+			SpawnWall (Floor(2));
+			SpawnWall (Floor(-2));
+			SpawnWall (Floor(3));
+			SpawnWall (Floor(-3));
 		}
-		if ((PlatformCount + 3) % 12 != 0 || PlatformSpawnPoint.position.z < 80) {
-			SpawnPlatform (1 * FloorHeight, light2);
-			if (light1) {
-				SpawnCrate (FloorHeight + PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2);
-			}
-		} else {
-			SpawnHoleTrigger (FloorHeight - PlatformHeight);
+		
+		if (floor1Thing != "H") {
+			SpawnPlatform (Floor(1));
 		}
-		if ((PlatformCount - 1) % 12 != 0 || PlatformSpawnPoint.position.z < 80) {
-			SpawnPlatform (-1 * FloorHeight, light2);
-			if (light1) {
-				SpawnCrate (-FloorHeight + PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2);
-			}
-		} else {
-			SpawnHoleTrigger (-FloorHeight - PlatformHeight);
+		if (floor0Thing != "H") {
+			SpawnPlatform (Floor(0));
 		}
-		SpawnPlatform (2 * FloorHeight, light1);
-		SpawnPlatform (-2 * FloorHeight, light1);
-		SpawnPlatform (3 * FloorHeight, light2);
-		SpawnPlatform (-3 * FloorHeight, light2);
+		if (floor_1Thing != "H") {
+			SpawnPlatform (Floor(-1));
+		}
+		SpawnPlatform (Floor(2));
+		SpawnPlatform (Floor(-2));
+		SpawnPlatform (Floor(3));
+		SpawnPlatform (Floor(-3));
+
+		// HoleTriggers
+		if (floor1Thing == "H") {
+			SpawnHoleTrigger (Floor(1));
+		}
+		if (floor0Thing == "H") {
+			SpawnHoleTrigger (Floor(0));
+		}
+		if (floor_1Thing == "H") {
+			SpawnHoleTrigger (Floor(-1));
+		}
+
+		// Spotlights and Crates
+		if (floor1Thing == "L") {
+			SpawnSpotlight (Floor(1));
+			SpawnCrate (Floor(1));
+		}
+		if (floor0Thing == "L") {
+			SpawnSpotlight (Floor(0));
+			SpawnCrate (Floor(0));
+		}
+		if (floor_1Thing == "L") {
+			SpawnSpotlight (Floor(-1));
+			SpawnCrate (Floor(-1));
+		}
+
+		// Trees
+		if (floor1Thing == "T") {
+			SpawnTree (Floor (1));
+		}
+		if (floor0Thing == "T") {
+			SpawnTree (Floor (0));
+		}
+		if (floor_1Thing == "T") {
+			SpawnTree (Floor (-1));
+		}
+
 		PlatformSpawnPoint.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
 			PlatformSpawnPoint.transform.position.y,
 			PlatformSpawnPoint.transform.position.z + PlatformLength// + PlatformGap
 		);
+
+		PlatformCount++;
 	}
 
-	void SpawnPlatform(float height, bool light) {
+	void SpawnWall(float floor) {
+		GameObject wall = PrefabManager.GetPrefab (Wall);
+		wall.transform.position = new Vector3 (
+			PlatformSpawnPoint.transform.position.x - PlatformWidth / 2,
+			floor + FloorHeight / 2,
+			PlatformSpawnPoint.transform.position.z
+		);
+		wall.SetActive (true);
+	}
+
+	void SpawnSpotlight(float floor) {
+		GameObject spotlight = null;
+		spotlight = PrefabManager.GetPrefab (Spotlight);
+		spotlight.transform.position = new Vector3 (
+			PlatformSpawnPoint.transform.position.x,
+			floor + FloorHeight,
+			PlatformSpawnPoint.transform.position.z
+		);
+		spotlight.SetActive (true);
+	}
+
+	void SpawnPlatform(float floor) {
 		GameObject platform = null;
-		if (light) {
-			platform = PrefabManager.GetPrefab (PlatformWithLight);
-		} else {
-			platform = PrefabManager.GetPrefab (Platform);		
-		}
+		platform = PrefabManager.GetPrefab (Platform);		
 		platform.transform.parent = GameObject.FindGameObjectWithTag ("Platforms").transform;
 		platform.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
-			PlatformSpawnPoint.transform.position.y + height,
+			floor,
 			PlatformSpawnPoint.transform.position.z
 		);
 		platform.SetActive (true);
@@ -100,22 +168,34 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 	
-	void SpawnHoleTrigger(float height) {
+	void SpawnHoleTrigger(float floor) {
 		GameObject holeTrigger = PrefabManager.GetPrefab(HoleTrigger);
 		holeTrigger.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
-			Player.transform.position.y + height,
+			floor,
 			PlatformSpawnPoint.transform.position.z - PlatformLength / 2
 		);
 		holeTrigger.SetActive (true);
 	}
 
-	void SpawnCrate(float height) {
+	void SpawnTree(float floor) {
+		if (PlatformSpawnPoint.transform.position.z > 80) {
+			GameObject tree = PrefabManager.GetPrefab (Tree);
+			tree.transform.position = new Vector3 (
+				PlatformSpawnPoint.transform.position.x,
+				floor + FloorHeight,
+				PlatformSpawnPoint.transform.position.z
+			);
+			tree.SetActive (true);
+		}
+	}
+
+	void SpawnCrate(float floor) {
 		if (PlatformSpawnPoint.transform.position.z > 80) {
 			GameObject crate = PrefabManager.GetPrefab (Crate);
 			crate.transform.position = new Vector3 (
 				PlatformSpawnPoint.transform.position.x,
-				PlatformSpawnPoint.transform.position.y + height,
+				floor + PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2,
 				PlatformSpawnPoint.transform.position.z
 			);
 			crate.SetActive (true);
@@ -124,7 +204,7 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	public void Reset() {
-		PlatformCount = 0;
+		PlatformCount = 1;
 		PlatformSpawnPoint.transform.position = PlatformSpawnPointInitialPos;
 	}
 }
