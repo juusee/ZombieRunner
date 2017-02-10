@@ -18,7 +18,7 @@ public class PlayerMovement : MonoBehaviour {
 	enum PlayerState {Running, Jumping, Sliding, Stuck};
 	PlayerState CurrentState;
 	float SlidingStartPos = 0f;
-	float SlidingLength = 20f;
+	float SlidingLength = 15f;
 
 	Quaternion TargetRotation;
 
