@@ -21,7 +21,12 @@ public class GameLogic : MonoBehaviour {
 	float FloorHeight = 13f;
 	Vector3 PlatformSpawnPointInitialPos;
 
-	int PlatformCount = 1;
+	int PlatformCount;
+
+	static string[] Floor1;
+	static string[] Floor0;
+	static string[] Floor_1;
+	static int Phases;
 
 	void Awake() {
 		PlatformSpawnPointInitialPos = PlatformSpawnPoint.transform.position;
@@ -35,6 +40,8 @@ public class GameLogic : MonoBehaviour {
 		foreach (GameObject platform in GameObject.FindGameObjectsWithTag ("Platform")) {
 			PrefabManager.AddPrefab (Platform, platform);
 		}
+
+		Reset ();
 	}
 	
 	// Update is called once per frame
@@ -43,6 +50,14 @@ public class GameLogic : MonoBehaviour {
 		if (PlatformSpawnPoint.position.z - Player.transform.position.z < PlatformSpawnLengthFromPlayer) {
 			BuildFloors ();
 		}
+
+		// DEVELOPMENT
+		/*if (Input.GetKeyDown (KeyCode.Alpha1))
+			SetFloors (-1);
+		if (Input.GetKeyDown (KeyCode.Alpha2))
+			SetFloors (0);
+		if (Input.GetKeyDown (KeyCode.Alpha3))
+			SetFloors (1);*/
 	}
 
 	float Floor(int floorNumber) {
@@ -50,16 +65,11 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	void BuildFloors() {
-		string[] floor1 =  new string[] {"L", "-", "-", "H", "-", "-", "-", "-", "L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "H", "-"};
-		string[] floor0 =  new string[] {"-", "-", "-", "-", "L", "-", "-", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "T", "-", "L", "-", "-", "-"};
-		string[] floor_1 = new string[] {"L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "-", "-", "L", "-", "H", "-", "-", "-", "-", "-"};
+		int currentPhase = PlatformCount % Phases;
 
-		int phases = floor1.Length;
-		int currentPhase = PlatformCount % phases;
-
-		string floor1Thing = floor1 [currentPhase];
-		string floor0Thing = floor0 [currentPhase];
-		string floor_1Thing = floor_1 [currentPhase];
+		string floor1Thing = Floor1 [currentPhase];
+		string floor0Thing = Floor0 [currentPhase];
+		string floor_1Thing = Floor_1 [currentPhase];
 
 		// Walls
 		if (PlatformCount % 3 == 0) {
@@ -173,7 +183,7 @@ public class GameLogic : MonoBehaviour {
 		holeTrigger.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
 			floor,
-			PlatformSpawnPoint.transform.position.z - PlatformLength / 2
+			PlatformSpawnPoint.transform.position.z
 		);
 		holeTrigger.SetActive (true);
 	}
@@ -203,8 +213,39 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 
+	// DEVELOPMENT
+	/*public static void SetFloors(int jou) {
+		Floor0 =  new string[24];
+		Floor1 =  new string[24];
+		Floor_1 =  new string[24];
+		for (int i = 0; i < Floor0.Length; ++i) {
+			Floor0[i] = "-";
+			Floor1[i] = "-";
+			Floor_1[i] = "-";
+			if (jou == 1 && i % 14 == 0) {
+				Floor1[i] = "H";
+			}
+			if (jou == 0 && i % 10 == 0) {
+				Floor0[i] = "H";
+			}
+			if (jou == -1 && i % 18 == 0) {
+				Floor_1[i] = "H";
+			}
+		}
+		Phases = Floor1.Length;
+	}*/
+
 	public void Reset() {
 		PlatformCount = 1;
 		PlatformSpawnPoint.transform.position = PlatformSpawnPointInitialPos;
+		Floor1 =  new string[] {"L", "-", "-", "H", "-", "-", "-", "-", "L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "H", "-"};
+		Floor0 =  new string[] {"-", "-", "-", "-", "L", "-", "-", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "T", "-", "-", "L", "-", "-", "-"};
+		Floor_1 = new string[] {"L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "-", "-", "L", "-", "H", "-", "-", "-", "-", "-"};
+
+		//Floor1 =  new string[] {"-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "H", "-"};
+		//Floor0 =  new string[] {"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"};
+		//Floor_1 = new string[] {"-", "-", "-", "-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "-", "-", "", "-", "H", "-", "-", "-", "-", "-"};
+
+		Phases = Floor1.Length;
 	}
 }

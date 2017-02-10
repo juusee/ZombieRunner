@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour {
 
 	public Transform PlatformSpawnPoint;
-	public static float FloorHeight = 0f;
-	public static float Speed = 20f;
+	public static float CurrentFloor = 0f;
+	public static float MaxSpeed = 20f;
 	public GameObject EnemyWall;
 
 	Rigidbody RB;
@@ -22,6 +22,8 @@ public class PlayerMovement : MonoBehaviour {
 
 	Quaternion TargetRotation;
 
+	Vector3 LastObstaclePos;
+
 	// Use this for initialization
 	void Start () {
 		RB = GetComponent<Rigidbody> ();
@@ -29,6 +31,17 @@ public class PlayerMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		// Development
+		/*if (Input.GetKeyDown (KeyCode.UpArrow)) {
+			CurrentFloor = 13f;
+		}
+		if (Input.GetKeyDown (KeyCode.RightArrow)) {
+			CurrentFloor = 0f;
+		}
+		if (Input.GetKeyDown (KeyCode.DownArrow)) {
+			CurrentFloor = -13f;
+		}*/
+
 		if (Input.GetMouseButtonDown(0)) {
 			MoveStartPos = Input.mousePosition;
 		}
@@ -38,10 +51,10 @@ public class PlayerMovement : MonoBehaviour {
 			MoveStartPos = Vector2.zero;
 		}
 		float speed = RB.velocity.z;
-		if (speed > Speed) {
+		if (speed > MaxSpeed) {
 			speed -= 30f * Time.deltaTime;
 		} else {
-			speed = Speed;
+			speed = MaxSpeed;
 		}
 		RB.velocity = new Vector3 (RB.velocity.x, RB.velocity.y, speed);
 		if (CurrentState == PlayerState.Sliding && transform.position.z - SlidingStartPos > SlidingLength) {
@@ -56,7 +69,7 @@ public class PlayerMovement : MonoBehaviour {
 	void Jump(float jumpAngle) {
 		TargetRotation = Quaternion.AngleAxis (90 - jumpAngle, Vector3.right);
 		Vector3 angleVelocity = Quaternion.AngleAxis (jumpAngle, Vector3.left) * Vector3.forward;
-		Vector3 forceVector = new Vector3 (angleVelocity.x * JumpSpeed, angleVelocity.y * JumpSpeed, angleVelocity.z * Speed);
+		Vector3 forceVector = new Vector3 (angleVelocity.x * JumpSpeed, angleVelocity.y * JumpSpeed, angleVelocity.z * MaxSpeed);
 		RB.AddForce (forceVector, ForceMode.VelocityChange);
 		CurrentState = PlayerState.Jumping;
 	}
@@ -78,13 +91,13 @@ public class PlayerMovement : MonoBehaviour {
 	}
 
 	void OnTriggerEnter(Collider col) {
-		if (col.gameObject.tag == "PlatformTop" && FloorHeight != col.transform.parent.position.y) {
+		if (col.gameObject.tag == "PlatformTop" && CurrentFloor != col.transform.parent.position.y) {
 			PlatformSpawnPoint.position = new Vector3 (
 				PlatformSpawnPoint.transform.position.x,
 				col.transform.parent.position.y,
 				PlatformSpawnPoint.transform.position.z
 			);
-			FloorHeight = col.transform.parent.position.y;
+			CurrentFloor = col.transform.parent.position.y;
 		}
 		// Stuck on front of platform
 		// TODO maybe add some injury animation and let zombies closer?
@@ -97,8 +110,10 @@ public class PlayerMovement : MonoBehaviour {
 			CurrentState = PlayerState.Running;
 			TargetRotation = Quaternion.AngleAxis (0, Vector3.right);
 		}
-		if (col.gameObject.tag == "Obstacle") {
-			EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ += 7f;
+		// Position check prevents double trigger on same obstacle
+		if (col.gameObject.tag == "Obstacle" && LastObstaclePos != col.transform.position) {
+			EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ += 10f;
+			LastObstaclePos = col.transform.position;
 		}
 	}
 
@@ -117,8 +132,10 @@ public class PlayerMovement : MonoBehaviour {
 		if (col.gameObject.tag == "Enemy") {
 			gameObject.SetActive (false);
 		}
-		if (col.gameObject.tag == "Obstacle") {
-			EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ += 7f;
+		// Position check prevents double trigger on same obstacle
+		if (col.gameObject.tag == "Obstacle" && LastObstaclePos != col.transform.position) {
+			EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ += 10f;
+			LastObstaclePos = col.transform.position;
 		}
 	}
 }

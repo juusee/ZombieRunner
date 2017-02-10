@@ -19,14 +19,14 @@ public class EnemyManager : MonoBehaviour {
 
 	public void DisableControl() {
 		foreach (GameObject enemy in Enemies) {
-			enemy.GetComponent<EnemyMovement>().enabled = false;
+			enemy.GetComponent<Enemy>().enabled = false;
 			enemy.GetComponent<Rigidbody> ().isKinematic = true;
 		}
 	}
 
 	public void EnableControl() {
 		foreach (GameObject enemy in Enemies) {
-			enemy.GetComponent<EnemyMovement>().enabled = true;
+			enemy.GetComponent<Enemy>().enabled = true;
 			enemy.GetComponent<Rigidbody> ().isKinematic = false;
 		}
 	}
