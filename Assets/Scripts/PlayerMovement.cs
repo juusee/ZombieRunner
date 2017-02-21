@@ -42,14 +42,33 @@ public class PlayerMovement : MonoBehaviour {
 			CurrentFloor = -13f;
 		}*/
 
+		Vector2 currentCursorPos = Vector2.zero;
+		#if UNITY_EDITOR
 		if (Input.GetMouseButtonDown(0)) {
 			MoveStartPos = Input.mousePosition;
 		}
-		if (CurrentState == PlayerState.Running && MoveStartPos != Vector2.zero && Input.GetMouseButton (0) && Vector2.Distance (MoveStartPos, Input.mousePosition) > 50f) {
-			MoveEndPos = Input.mousePosition;
+		if (Input.GetMouseButton(0)) {
+			currentCursorPos = Input.mousePosition;
+		}
+		#else
+		if (Input.touchCount > 0) {
+			Touch touch = Input.GetTouch(0);
+			if (touch.phase == TouchPhase.Began) {
+				MoveStartPos = touch.position;
+			}
+			if (touch.phase == TouchPhase.Moved) {
+				currentCursorPos = touch.position;
+			}
+		}
+		#endif
+
+		if (CurrentState == PlayerState.Running && MoveStartPos != Vector2.zero &&
+			currentCursorPos != Vector2.zero && Vector2.Distance (MoveStartPos, currentCursorPos) > 30f) {
+			MoveEndPos = currentCursorPos;
 			Move ();
 			MoveStartPos = Vector2.zero;
 		}
+
 		float speed = RB.velocity.z;
 		if (speed > MaxSpeed) {
 			speed -= 30f * Time.deltaTime;
