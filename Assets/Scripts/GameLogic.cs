@@ -22,10 +22,13 @@ public class GameLogic : MonoBehaviour {
 	Vector3 PlatformSpawnPointInitialPos;
 
 	int PlatformCount;
+	float InitialFloorHeight;
+	int FloorCount = 7;
 
 	static string[] Floor1;
 	static string[] Floor0;
 	static string[] Floor_1;
+	static string[][] Floors;
 	static int Phases;
 
 	void Awake() {
@@ -60,76 +63,57 @@ public class GameLogic : MonoBehaviour {
 			SetFloors (1);*/
 	}
 
-	float Floor(int floorNumber) {
-		return PlatformSpawnPoint.position.y + floorNumber * FloorHeight;
+	float FloorPositionY(int floorNumber) {
+		// TODO maybe improve Floors.Length * FloorHeight
+		return PlatformSpawnPoint.position.y + floorNumber * FloorHeight - FloorCount / 2 * FloorHeight;
+	}
+
+	void BuildFloor(int floor) {
+		int currentPhase = PlatformCount % Phases;
+
+		// TODO better var name and improve
+		int floorShape = (int) Mathf.Abs((Mathf.Abs(floor) + PlayerMovement.CurrentFloor / FloorHeight)) % Floors.Length;
+		//print (floorShape);
+		string floorThing = Floors[floorShape][currentPhase];
+
+		// Wall
+		if (PlatformCount % 3 == 0) {
+			SpawnWall (FloorPositionY(floor));
+		}
+
+		// TODO
+		if (FloorCount % 2 == 0) {
+			Debug.LogError ("WRONG FLOOR COUNT");
+		}
+
+		// Floor else hole
+		if (floorThing != "H") {
+			SpawnPlatform (FloorPositionY (floor), floorShape);
+		}
+		// HoleTrigger
+		if (floorThing == "H") {
+			SpawnHoleTrigger (FloorPositionY (floor));
+		}
+		// FloorThings only on current floor or one above or below
+		if (floor == FloorCount / 2 || floor == FloorCount / 2 + 1 || floor == FloorCount / 2 - 1) {
+			// Spotlight and Crate
+			if (floorThing == "L") {
+				SpawnSpotlight (FloorPositionY (floor));
+				SpawnCrate (FloorPositionY (floor));
+			}
+
+			// Tree
+			if (floorThing == "T") {
+				SpawnTree (FloorPositionY (floor));
+			}
+		}
 	}
 
 	void BuildFloors() {
-		int currentPhase = PlatformCount % Phases;
 
-		string floor1Thing = Floor1 [currentPhase];
-		string floor0Thing = Floor0 [currentPhase];
-		string floor_1Thing = Floor_1 [currentPhase];
-
-		// Walls
-		if (PlatformCount % 3 == 0) {
-			SpawnWall (Floor(0));
-			SpawnWall (Floor(1));
-			SpawnWall (Floor(-1));
-			SpawnWall (Floor(2));
-			SpawnWall (Floor(-2));
-			SpawnWall (Floor(3));
-			SpawnWall (Floor(-3));
-		}
-		
-		if (floor1Thing != "H") {
-			SpawnPlatform (Floor(1));
-		}
-		if (floor0Thing != "H") {
-			SpawnPlatform (Floor(0));
-		}
-		if (floor_1Thing != "H") {
-			SpawnPlatform (Floor(-1));
-		}
-		SpawnPlatform (Floor(2));
-		SpawnPlatform (Floor(-2));
-		SpawnPlatform (Floor(3));
-		SpawnPlatform (Floor(-3));
-
-		// HoleTriggers
-		if (floor1Thing == "H") {
-			SpawnHoleTrigger (Floor(1));
-		}
-		if (floor0Thing == "H") {
-			SpawnHoleTrigger (Floor(0));
-		}
-		if (floor_1Thing == "H") {
-			SpawnHoleTrigger (Floor(-1));
-		}
-
-		// Spotlights and Crates
-		if (floor1Thing == "L") {
-			SpawnSpotlight (Floor(1));
-			SpawnCrate (Floor(1));
-		}
-		if (floor0Thing == "L") {
-			SpawnSpotlight (Floor(0));
-			SpawnCrate (Floor(0));
-		}
-		if (floor_1Thing == "L") {
-			SpawnSpotlight (Floor(-1));
-			SpawnCrate (Floor(-1));
-		}
-
-		// Trees
-		if (floor1Thing == "T") {
-			SpawnTree (Floor (1));
-		}
-		if (floor0Thing == "T") {
-			SpawnTree (Floor (0));
-		}
-		if (floor_1Thing == "T") {
-			SpawnTree (Floor (-1));
+		// TODO Maybe improve
+		for (int i = 0; i < FloorCount; ++i) {
+			BuildFloor (i);
 		}
 
 		PlatformSpawnPoint.transform.position = new Vector3 (
@@ -141,36 +125,42 @@ public class GameLogic : MonoBehaviour {
 		PlatformCount++;
 	}
 
-	void SpawnWall(float floor) {
+	void SpawnWall(float floorPositionY) {
 		GameObject wall = PrefabManager.GetPrefab (Wall);
 		wall.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x - PlatformWidth / 2,
-			floor + FloorHeight / 2,
+			floorPositionY + FloorHeight / 2,
 			PlatformSpawnPoint.transform.position.z
 		);
 		wall.SetActive (true);
 	}
 
-	void SpawnSpotlight(float floor) {
+	void SpawnSpotlight(float floorPositionY) {
 		GameObject spotlight = null;
 		spotlight = PrefabManager.GetPrefab (Spotlight);
 		spotlight.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
-			floor + FloorHeight,
+			floorPositionY + FloorHeight,
 			PlatformSpawnPoint.transform.position.z
 		);
 		spotlight.SetActive (true);
 	}
 
-	void SpawnPlatform(float floor) {
+	void SpawnPlatform(float floorPositionY, int jou) {
 		GameObject platform = null;
 		platform = PrefabManager.GetPrefab (Platform);		
 		platform.transform.parent = GameObject.FindGameObjectWithTag ("Platforms").transform;
 		platform.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
-			floor,
+			floorPositionY,
 			PlatformSpawnPoint.transform.position.z
 		);
+		if (jou == 0)
+			platform.GetComponent<Renderer> ().material.color = Color.blue;
+		if (jou == 1)
+			platform.GetComponent<Renderer> ().material.color = Color.red;
+		if (jou == 2)
+			platform.GetComponent<Renderer> ().material.color = Color.green;
 		platform.SetActive (true);
 		// TODO find out why all of the children are not active. Same on crate
 		foreach (Transform child in platform.transform) {
@@ -178,34 +168,34 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 	
-	void SpawnHoleTrigger(float floor) {
+	void SpawnHoleTrigger(float floorPositionY) {
 		GameObject holeTrigger = PrefabManager.GetPrefab(HoleTrigger);
 		holeTrigger.transform.position = new Vector3 (
 			PlatformSpawnPoint.transform.position.x,
-			floor,
+			floorPositionY,
 			PlatformSpawnPoint.transform.position.z
 		);
 		holeTrigger.SetActive (true);
 	}
 
-	void SpawnTree(float floor) {
+	void SpawnTree(float floorPositionY) {
 		if (PlatformSpawnPoint.transform.position.z > 80) {
 			GameObject tree = PrefabManager.GetPrefab (Tree);
 			tree.transform.position = new Vector3 (
 				PlatformSpawnPoint.transform.position.x,
-				floor + FloorHeight,
+				floorPositionY + FloorHeight,
 				PlatformSpawnPoint.transform.position.z
 			);
 			tree.SetActive (true);
 		}
 	}
 
-	void SpawnCrate(float floor) {
+	void SpawnCrate(float floorPositionY) {
 		if (PlatformSpawnPoint.transform.position.z > 80) {
 			GameObject crate = PrefabManager.GetPrefab (Crate);
 			crate.transform.position = new Vector3 (
 				PlatformSpawnPoint.transform.position.x,
-				floor + PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2,
+				floorPositionY + PlatformHeight / 2 + Crate.GetComponent<Renderer> ().bounds.size.y / 2,
 				PlatformSpawnPoint.transform.position.z
 			);
 			crate.SetActive (true);
@@ -241,6 +231,8 @@ public class GameLogic : MonoBehaviour {
 		Floor1 =  new string[] {"L", "-", "-", "H", "-", "-", "-", "-", "L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "H", "-"};
 		Floor0 =  new string[] {"-", "-", "-", "-", "L", "-", "-", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "T", "-", "-", "L", "-", "-", "-"};
 		Floor_1 = new string[] {"L", "-", "T", "-", "-", "-", "H", "-", "L", "-", "-", "-", "-", "-", "-", "-", "L", "-", "H", "-", "-", "-", "-", "-"};
+
+		Floors = new string[][] { Floor_1, Floor0, Floor1 };
 
 		//Floor1 =  new string[] {"-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "H", "-"};
 		//Floor0 =  new string[] {"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "H", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-"};
