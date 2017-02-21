@@ -142,6 +142,10 @@ public class PlayerMovement : MonoBehaviour {
 		}
 	}
 
+	void OnDisable() {
+		CurrentFloor = 0;
+	}
+
 	void OnEnable() {
 		CurrentState = PlayerState.Running;
 		EnemyWall.GetComponent<EnemyWallMovement> ().OffsetZ = -20f;

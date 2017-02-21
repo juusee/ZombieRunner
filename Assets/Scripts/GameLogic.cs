@@ -73,7 +73,6 @@ public class GameLogic : MonoBehaviour {
 
 		// TODO better var name and improve
 		int floorShape = (int) Mathf.Abs((Mathf.Abs(floor) + PlayerMovement.CurrentFloor / FloorHeight)) % Floors.Length;
-		//print (floorShape);
 		string floorThing = Floors[floorShape][currentPhase];
 
 		// Wall
@@ -155,12 +154,14 @@ public class GameLogic : MonoBehaviour {
 			floorPositionY,
 			PlatformSpawnPoint.transform.position.z
 		);
+		// DEBUG
 		if (jou == 0)
 			platform.GetComponent<Renderer> ().material.color = Color.blue;
 		if (jou == 1)
 			platform.GetComponent<Renderer> ().material.color = Color.red;
 		if (jou == 2)
 			platform.GetComponent<Renderer> ().material.color = Color.green;
+		
 		platform.SetActive (true);
 		// TODO find out why all of the children are not active. Same on crate
 		foreach (Transform child in platform.transform) {
@@ -187,6 +188,7 @@ public class GameLogic : MonoBehaviour {
 				PlatformSpawnPoint.transform.position.z
 			);
 			tree.SetActive (true);
+			tree.transform.GetChild (0).gameObject.SetActive (true);
 		}
 	}
 

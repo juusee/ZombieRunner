@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour {
 
+	public bool DestroyParent = false;
 	bool Destroying = false;
 
 	// Use this for initialization
@@ -26,12 +27,25 @@ public class Obstacle : MonoBehaviour {
 		}
 	}
 
+	void OnTriggerEnter(Collider col) {
+		if (col.gameObject.tag == "Player" && !Destroying) {
+			Destroying = true;
+			StartCoroutine (WaitAndDestruct ());
+		} else if (col.gameObject.tag == "Enemy" && !Destroying) {
+			Destroying = true;
+			Destruct ();
+		}
+	}
+
 	IEnumerator WaitAndDestruct() {
 		yield return new WaitForSeconds(0.15f);
 		Destruct ();
 	}
 
 	void Destruct() {
+		if (DestroyParent) {
+			transform.parent.gameObject.SetActive (false);
+		}
 		gameObject.SetActive (false);
 		Destroying = false;
 	}
